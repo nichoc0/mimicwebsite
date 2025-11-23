@@ -1,0 +1,49 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { retryWorkflowRun } from '@/lib/api';
+
+interface RetryWorkflowButtonProps {
+  runId: string;
+}
+
+export function RetryWorkflowButton({ runId }: RetryWorkflowButtonProps) {
+  const router = useRouter();
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleRetry() {
+    if (pending) {
+      return;
+    }
+
+    setPending(true);
+    setError(null);
+
+    const result = await retryWorkflowRun(runId);
+
+    if (result.error) {
+      setError(result.error);
+      setPending(false);
+      return;
+    }
+
+    router.refresh();
+    setPending(false);
+  }
+
+  return (
+    <div className="flex flex-col gap-1">
+      <button
+        type="button"
+        onClick={handleRetry}
+        className="rounded-lg border border-slate-300 px-3 py-1 text-xs font-medium text-slate-600 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-70 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+        disabled={pending}
+      >
+        {pending ? 'Retrying…' : 'Retry run'}
+      </button>
+      {error && <span className="text-[11px] text-rose-500 dark:text-rose-300">{error}</span>}
+    </div>
+  );
+}

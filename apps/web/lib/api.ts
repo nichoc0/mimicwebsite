@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import type {
   ComplianceEventRecord,
   ComplianceSummary,
@@ -5,6 +6,7 @@ import type {
   CreateContactPayload,
   HealthHeartbeat,
   MediaAssetRecord,
+  Message,
   WorkflowOverview,
   WorkflowRun,
 } from './types';
@@ -17,7 +19,17 @@ type FetchResult<T> = {
   status: number;
 };
 
-async function fetchJson<T>(path: string, init?: RequestInit): Promise<FetchResult<T>> {
+type CacheStrategy =
+  | { cache: 'force-cache' }
+  | { cache: 'no-store' }
+  | { next: { revalidate: number } };
+
+async function fetchJson<T>(
+  path: string,
+  init?: RequestInit,
+  token?: string | null,
+  cacheStrategy: CacheStrategy = { next: { revalidate: 60 } }
+): Promise<FetchResult<T>> {
   const url = `${API_BASE_URL}${path}`;
 
   try {
@@ -25,9 +37,10 @@ async function fetchJson<T>(path: string, init?: RequestInit): Promise<FetchResu
       ...init,
       headers: {
         'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...(init?.headers ?? {}),
       },
-      cache: 'no-store',
+      ...cacheStrategy,
     });
 
     if (!response.ok) {
@@ -71,80 +84,101 @@ function pruneEmptyValues<T extends object>(input: T) {
   return Object.fromEntries(entries) as Partial<T>;
 }
 
-export async function getContacts(): Promise<FetchResult<Contact[]>> {
-  const result = await fetchJson<Contact[]>('/contacts');
+export const getContacts = cache(async (token?: string | null): Promise<FetchResult<Contact[]>> => {
+  const result = await fetchJson<Contact[]>('/contacts', undefined, token, { next: { revalidate: 30 } });
 
   return {
     data: result.data ?? [],
     error: result.error,
     status: result.status,
   };
-}
+});
 
-export async function getContact(id: string): Promise<FetchResult<Contact | null>> {
-  const result = await fetchJson<Contact>(`/contacts/${id}`);
+export const getContact = cache(async (id: string, token?: string | null): Promise<FetchResult<Contact | null>> => {
+  const result = await fetchJson<Contact>(`/contacts/${id}`, undefined, token, { next: { revalidate: 30 } });
 
   return {
     ...result,
     data: result.data,
   };
-}
+});
 
-export async function createContact(payload: CreateContactPayload): Promise<FetchResult<Contact>> {
+export async function createContact(payload: CreateContactPayload, token?: string | null): Promise<FetchResult<Contact>> {
   const body = JSON.stringify(pruneEmptyValues(payload));
   return fetchJson<Contact>('/contacts', {
     method: 'POST',
     body,
-  });
+  }, token, { cache: 'no-store' });
 }
 
-export async function getWorkflowOverview(): Promise<FetchResult<WorkflowOverview>> {
-  return fetchJson<WorkflowOverview>('/workflows/overview');
-}
+export const getWorkflowOverview = cache(async (token?: string | null): Promise<FetchResult<WorkflowOverview>> => {
+  return fetchJson<WorkflowOverview>('/workflows/overview', undefined, token, { next: { revalidate: 60 } });
+});
 
-export async function getWorkflowRuns(limit = 20): Promise<FetchResult<WorkflowRun[]>> {
-  const result = await fetchJson<WorkflowRun[]>(`/workflows/runs?limit=${limit}`);
+export const getWorkflowRuns = cache(async (limit = 20, token?: string | null): Promise<FetchResult<WorkflowRun[]>> => {
+  const result = await fetchJson<WorkflowRun[]>(`/workflows/runs?limit=${limit}`, undefined, token, { next: { revalidate: 30 } });
 
   return {
     data: result.data ?? [],
     error: result.error,
     status: result.status,
   };
-}
+});
 
-export async function retryWorkflowRun(runId: string) {
+export async function retryWorkflowRun(runId: string, token?: string | null) {
   return fetchJson<{ runId: string; workflowKey: string; contactId: string }>(
     `/workflows/runs/${runId}/retry`,
     {
       method: 'POST',
     },
+    token,
+    { cache: 'no-store' }
   );
 }
 
-export async function getMediaAssets(limit = 50): Promise<FetchResult<MediaAssetRecord[]>> {
-  const result = await fetchJson<MediaAssetRecord[]>(`/media?limit=${limit}`);
+export const getMediaAssets = cache(async (limit = 50, token?: string | null): Promise<FetchResult<MediaAssetRecord[]>> => {
+  const result = await fetchJson<MediaAssetRecord[]>(`/media?limit=${limit}`, undefined, token, { cache: 'force-cache' });
 
   return {
     data: result.data ?? [],
     error: result.error,
     status: result.status,
   };
-}
+});
 
-export async function getComplianceEvents(limit = 50): Promise<FetchResult<ComplianceEventRecord[]>> {
-  const result = await fetchJson<ComplianceEventRecord[]>(`/compliance/events?limit=${limit}`);
+export const getComplianceEvents = cache(async (limit = 50, token?: string | null): Promise<FetchResult<ComplianceEventRecord[]>> => {
+  const result = await fetchJson<ComplianceEventRecord[]>(`/compliance/events?limit=${limit}`, undefined, token, { next: { revalidate: 60 } });
 
   return {
     data: result.data ?? [],
     error: result.error,
     status: result.status,
   };
+});
+
+export const getComplianceSummary = cache(async (token?: string | null): Promise<FetchResult<ComplianceSummary>> => {
+  return fetchJson<ComplianceSummary>('/compliance/summary', undefined, token, { cache: 'force-cache' });
+});
+
+export const getHealthHeartbeat = cache(async (token?: string | null): Promise<FetchResult<HealthHeartbeat>> => {
+  return fetchJson<HealthHeartbeat>('/health', undefined, token, { cache: 'no-store' });
+});
+
+export const getMessages = cache(async (contactId: string, token?: string | null): Promise<FetchResult<Message[]>> => {
+  const result = await fetchJson<Message[]>(`/contacts/${contactId}/messages`, undefined, token, { cache: 'no-store' });
+
+  return {
+    data: result.data ?? [],
+    error: result.error,
+    status: result.status,
+  };
+});
+
+export async function sendMessage(contactId: string, body: string, token?: string | null): Promise<FetchResult<Message>> {
+  return fetchJson<Message>(`/contacts/${contactId}/messages`, {
+    method: 'POST',
+    body: JSON.stringify({ body }),
+  }, token, { cache: 'no-store' });
 }
 
-export async function getComplianceSummary(): Promise<FetchResult<ComplianceSummary>> {
-  return fetchJson<ComplianceSummary>('/compliance/summary');
-}
 
-export async function getHealthHeartbeat(): Promise<FetchResult<HealthHeartbeat>> {
-  return fetchJson<HealthHeartbeat>('/health');
-}

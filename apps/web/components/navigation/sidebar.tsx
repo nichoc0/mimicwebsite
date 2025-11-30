@@ -1,8 +1,11 @@
 'use client';
 
+import { memo } from 'react';
 import clsx from 'clsx';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { motion } from 'framer-motion';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 export interface NavItem {
   href: string;
@@ -14,7 +17,7 @@ interface SidebarProps {
   items: NavItem[];
 }
 
-export function Sidebar({ items }: SidebarProps) {
+export const Sidebar = memo(function Sidebar({ items }: SidebarProps) {
   const pathname = usePathname();
 
   return (
@@ -27,15 +30,26 @@ export function Sidebar({ items }: SidebarProps) {
             key={item.href}
             href={item.href}
             className={clsx(
-              'rounded-md px-3 py-2 text-sm font-medium transition-colors',
+              'relative rounded-md px-3 py-2 text-sm font-medium transition-all duration-200 group',
               isActive
-                ? 'bg-slate-900 text-white shadow-sm dark:bg-slate-100 dark:text-slate-900'
-                : 'text-slate-600 hover:bg-slate-200 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white',
+                ? 'text-brand-navy dark:text-white bg-slate-100 dark:bg-slate-800'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800'
             )}
           >
-            <span className="block">{item.label}</span>
+            {isActive && (
+              <motion.div
+                layoutId="sidebar-active"
+                className="absolute inset-0 rounded-md bg-brand-gold shadow-md"
+                initial={false}
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              />
+            )}
+            <span className="relative z-10 block">{item.label}</span>
             {item.description && (
-              <span className="mt-0.5 block text-xs font-normal text-slate-500 dark:text-slate-400">
+              <span className={clsx(
+                "relative z-10 mt-0.5 block text-xs font-normal",
+                isActive ? "text-brand-navy/80 dark:text-slate-200" : "text-slate-600 dark:text-slate-400 group-hover:text-slate-800 dark:group-hover:text-slate-300"
+              )}>
                 {item.description}
               </span>
             )}
@@ -44,4 +58,4 @@ export function Sidebar({ items }: SidebarProps) {
       })}
     </nav>
   );
-}
+});

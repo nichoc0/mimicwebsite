@@ -1,12 +1,14 @@
 import Link from 'next/link';
+import { auth } from '@clerk/nextjs/server';
 import { getContacts } from '@/lib/api';
+import { ContactsTable } from '@/components/contacts/contacts-table';
+import { CreateContactButton } from '@/components/contacts/create-contact-button';
 import { formatDate, formatName, formatOptInStatus } from '@/lib/format';
 
-export const dynamic = 'force-dynamic';
-
 export default async function ContactsPage() {
-  const { data, error } = await getContacts();
-  const contacts = data ?? [];
+  const { getToken } = await auth();
+  const token = await getToken();
+  const { data: contacts, error } = await getContacts(token);
 
   return (
     <div className="space-y-8">

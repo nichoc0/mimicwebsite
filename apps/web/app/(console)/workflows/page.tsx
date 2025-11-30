@@ -1,16 +1,22 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { RetryWorkflowButton } from '@/components/workflows/retry-workflow-button';
+import { auth } from '@clerk/nextjs/server';
 import { getWorkflowOverview, getWorkflowRuns } from '@/lib/api';
+import { WorkflowStats } from '@/components/workflows/workflow-stats';
+import { WorkflowRunsTable } from '@/components/workflows/workflow-runs-table';
 import { formatDate, formatName, formatWorkflowKey, formatWorkflowStatus } from '@/lib/format';
 
-export const dynamic = 'force-dynamic';
-
 export default async function WorkflowsPage() {
-  const [overviewResult, runsResult] = await Promise.all([getWorkflowOverview(), getWorkflowRuns(25)]);
+  const { getToken } = await auth();
+  const token = await getToken();
+  const [overviewData, runsData] = await Promise.all([
+    getWorkflowOverview(token),
+    getWorkflowRuns(20, token),
+  ]);
 
-  const overview = overviewResult.data;
-  const runs = runsResult.data ?? [];
+  const overview = overviewData.data;
+  const runs = runsData.data ?? [];
 
   const counts = overview?.counts ?? {
     waiting: 0,
@@ -35,7 +41,7 @@ export default async function WorkflowsPage() {
         <p className="text-sm text-slate-500 dark:text-slate-400">
           Track automation queues, inspect run histories, and rerun failed jobs without leaving the console.
         </p>
-        {(overviewResult.error || runsResult.error) && (
+        {(overviewData.error || runsData.error) && (
           <p className="rounded-md border border-amber-500 bg-amber-100 px-3 py-2 text-xs text-amber-800 dark:border-amber-400 dark:bg-amber-900/30 dark:text-amber-200">
             We couldn&apos;t load the full workflow snapshot. Showing whatever data was available.
           </p>

@@ -1,19 +1,21 @@
 'use client';
 
+import { memo, useCallback, useState } from 'react';
+import { useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 import { retryWorkflowRun } from '@/lib/api';
 
 interface RetryWorkflowButtonProps {
   runId: string;
 }
 
-export function RetryWorkflowButton({ runId }: RetryWorkflowButtonProps) {
+export const RetryWorkflowButton = memo(function RetryWorkflowButton({ runId }: RetryWorkflowButtonProps) {
   const router = useRouter();
+  const { getToken } = useAuth();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleRetry() {
+  const handleRetry = useCallback(async () => {
     if (pending) {
       return;
     }
@@ -21,7 +23,8 @@ export function RetryWorkflowButton({ runId }: RetryWorkflowButtonProps) {
     setPending(true);
     setError(null);
 
-    const result = await retryWorkflowRun(runId);
+    const token = await getToken();
+    const result = await retryWorkflowRun(runId, token);
 
     if (result.error) {
       setError(result.error);
@@ -31,7 +34,7 @@ export function RetryWorkflowButton({ runId }: RetryWorkflowButtonProps) {
 
     router.refresh();
     setPending(false);
-  }
+  }, [pending, getToken, runId, router]);
 
   return (
     <div className="flex flex-col gap-1">
@@ -46,4 +49,4 @@ export function RetryWorkflowButton({ runId }: RetryWorkflowButtonProps) {
       {error && <span className="text-[11px] text-rose-500 dark:text-rose-300">{error}</span>}
     </div>
   );
-}
+});

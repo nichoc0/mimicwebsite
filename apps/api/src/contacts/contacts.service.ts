@@ -1,8 +1,10 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { WorkflowsService } from '../workflows/workflows.service';
+import { TelnyxService } from '../telnyx/telnyx.service';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
+import { MessageDirection, MessageStatus } from '@prisma/client';
 
 @Injectable()
 export class ContactsService {
@@ -11,25 +13,22 @@ export class ContactsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly workflowsService: WorkflowsService,
-  ) {}
+    private readonly telnyxService: TelnyxService,
+  ) { }
 
-  private get db() {
-    // Casting to a loose shape until Prisma Client types are generated during install.
-    return this.prisma as unknown as Record<string, any>;
-  }
-
-  async create(payload: CreateContactDto) {
+  async create(userId: string, payload: CreateContactDto) {
     const { tags = [], ...contactData } = payload;
 
-    const contact = await this.db.contact.create({
+    const contact = await this.prisma.contact.create({
       data: {
         ...contactData,
+        userId,
         tags: {
           create: tags.map((name: string) => ({
             tag: {
               connectOrCreate: {
-                where: { name },
-                create: { name },
+                where: { userId_name: { userId, name } },
+                create: { userId, name },
               },
             },
           })),
@@ -54,15 +53,16 @@ export class ContactsService {
     return contact;
   }
 
-  findAll() {
-    return this.db.contact.findMany({
+  findAll(userId: string) {
+    return this.prisma.contact.findMany({
+      where: { userId },
       include: {
         tags: {
           include: { tag: true },
         },
         messages: {
           orderBy: { createdAt: 'desc' },
-          take: 5,
+          take: 1,
         },
       },
       orderBy: { createdAt: 'desc' },
@@ -70,8 +70,8 @@ export class ContactsService {
     });
   }
 
-  async findOne(id: string) {
-    const contact = await this.db.contact.findUnique({
+  async findOne(userId: string, id: string) {
+    const contact = await this.prisma.contact.findUnique({
       where: { id },
       include: {
         tags: {
@@ -92,22 +92,22 @@ export class ContactsService {
       },
     });
 
-    if (!contact) {
+    if (!contact || contact.userId !== userId) {
       throw new NotFoundException(`Contact ${id} not found`);
     }
 
     return contact;
   }
 
-  async update(id: string, payload: UpdateContactDto) {
+  async update(userId: string, id: string, payload: UpdateContactDto) {
     const { tags, ...contactData } = payload;
 
-    const contact = await this.db.contact.findUnique({ where: { id } });
-    if (!contact) {
+    const contact = await this.prisma.contact.findUnique({ where: { id } });
+    if (!contact || contact.userId !== userId) {
       throw new NotFoundException(`Contact ${id} not found`);
     }
 
-    return this.db.contact.update({
+    return this.prisma.contact.update({
       where: { id },
       data: {
         ...contactData,
@@ -117,8 +117,8 @@ export class ContactsService {
             create: tags.map((name: string) => ({
               tag: {
                 connectOrCreate: {
-                  where: { name },
-                  create: { name },
+                  where: { userId_name: { userId, name } },
+                  create: { userId, name },
                 },
               },
             })),
@@ -133,12 +133,72 @@ export class ContactsService {
     });
   }
 
-  async remove(id: string) {
-    const exists = await this.db.contact.count({ where: { id } });
-    if (!exists) {
+  async remove(userId: string, id: string) {
+    const contact = await this.prisma.contact.findUnique({ where: { id } });
+    if (!contact || contact.userId !== userId) {
       throw new NotFoundException(`Contact ${id} not found`);
     }
 
-    return this.db.contact.delete({ where: { id } });
+    return this.prisma.contact.delete({ where: { id } });
+  }
+
+  async getMessages(userId: string, contactId: string) {
+    const contact = await this.prisma.contact.findUnique({ where: { id: contactId } });
+    if (!contact || contact.userId !== userId) {
+      throw new NotFoundException(`Contact ${contactId} not found`);
+    }
+
+    return this.prisma.message.findMany({
+      where: { contactId },
+      orderBy: { createdAt: 'asc' },
+    });
+  }
+
+  async sendMessage(userId: string, contactId: string, body: string) {
+    const contact = await this.prisma.contact.findUnique({ where: { id: contactId } });
+    if (!contact || contact.userId !== userId) {
+      throw new NotFoundException(`Contact ${contactId} not found`);
+    }
+
+    // Create message in DB first
+    const message = await this.prisma.message.create({
+      data: {
+        contactId,
+        direction: MessageDirection.OUTBOUND,
+        status: MessageStatus.QUEUED,
+        body,
+      },
+    });
+
+    this.logger.log(`Created queued message ${message.id}. Sending to Telnyx...`);
+
+    try {
+      const telnyxMessage = await this.telnyxService.sendSms({
+        to: contact.phone,
+        body,
+      });
+
+      // Update with SID and status
+      await this.prisma.message.update({
+        where: { id: message.id },
+        data: {
+          providerMessageId: telnyxMessage.sid,
+          status: MessageStatus.SENT, // Assumed sent to Telnyx
+          sentAt: new Date(),
+        },
+      });
+
+      return this.prisma.message.findUnique({ where: { id: message.id } });
+    } catch (error: any) {
+      this.logger.error(`Failed to send SMS to ${contact.phone}: ${error.message}`);
+      await this.prisma.message.update({
+        where: { id: message.id },
+        data: {
+          status: MessageStatus.FAILED,
+          errorMessage: error.message,
+        },
+      });
+      throw error;
+    }
   }
 }

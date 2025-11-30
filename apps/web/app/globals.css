@@ -7,5 +7,19 @@
 }
 
 body {
-  @apply font-sans bg-slate-50 dark:bg-slate-950 min-h-screen;
+  @apply font-sans bg-brand-cream text-slate-900 min-h-screen;
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/90 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200 dark:border-white/10 shadow-xl;
+  }
+
+  .glass-panel {
+    @apply bg-white/80 dark:bg-slate-900/50 backdrop-blur-md border border-slate-200 dark:border-white/10 shadow-lg;
+  }
+
+  .glass-card {
+    @apply bg-white/70 dark:bg-slate-800/40 backdrop-blur-md border border-slate-200 dark:border-white/5 shadow-sm hover:bg-white/80 dark:hover:bg-slate-800/50 transition-all duration-300;
+  }
 }

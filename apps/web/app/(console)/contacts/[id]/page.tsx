@@ -1,5 +1,7 @@
 import { notFound } from 'next/navigation';
+import { auth } from '@clerk/nextjs/server';
 import { getContact } from '@/lib/api';
+import { ContactProfile } from '@/components/contacts/contact-profile';
 import { formatDate, formatName, formatOptInStatus } from '@/lib/format';
 
 interface ContactPageProps {
@@ -8,9 +10,11 @@ interface ContactPageProps {
   };
 }
 
-export default async function ContactProfilePage({ params }: ContactPageProps) {
+export default async function ContactPage({ params }: { params: { id: string } }) {
+  const { getToken } = await auth();
+  const token = await getToken();
   const { id } = params;
-  const { data: contact, error, status } = await getContact(id);
+  const { data: contact, error, status } = await getContact(id, token);
 
   if (!contact) {
     if (status === 404) {

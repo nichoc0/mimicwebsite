@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { HealthModule } from './health/health.module';
-import { TwilioModule } from './twilio/twilio.module';
+import { TelnyxModule } from './telnyx/telnyx.module';
 import { DatabaseModule } from './database/database.module';
 import { ContactsModule } from './contacts/contacts.module';
 import { WorkflowsModule } from './workflows/workflows.module';
@@ -18,7 +18,7 @@ import { ComplianceModule } from './compliance/compliance.module';
     }),
     DatabaseModule,
     HealthModule,
-    TwilioModule,
+    TelnyxModule,
     ContactsModule,
     WorkflowsModule,
     MediaModule,
@@ -27,4 +27,4 @@ import { ComplianceModule } from './compliance/compliance.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

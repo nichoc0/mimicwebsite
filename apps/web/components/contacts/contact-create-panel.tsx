@@ -26,6 +26,7 @@ export function ContactCreatePanel() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const { getToken } = useAuth(); // Added useAuth hook
 
   const toggleOpen = () => {
     setIsOpen((value) => !value);
@@ -57,7 +58,8 @@ export function ContactCreatePanel() {
     };
 
     startTransition(async () => {
-      const result = await createContact(payload);
+      const token = await getToken(); // Get token
+      const result = await createContact(payload, token); // Pass token to createContact
 
       if (result.error || !result.data) {
         setError(result.error ?? 'Failed to create contact');

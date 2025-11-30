@@ -44,10 +44,11 @@ enum WorkflowRunStatus {
 
 model Contact {
   id              String          @id @default(cuid())
+  userId          String          // Clerk User ID
   firstName       String?
   lastName        String?
-  phone           String          @unique
-  email           String?         @unique
+  phone           String
+  email           String?
   emotionalProfile String?
   birthday        DateTime?
   leadSource      String?
@@ -62,13 +63,21 @@ model Contact {
   complianceEvents ComplianceEvent[]
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
+
+  @@unique([userId, phone])
+  @@unique([userId, email])
+  @@index([userId])
 }
 
 model Tag {
   id        String       @id @default(cuid())
-  name      String       @unique
+  userId    String       // Clerk User ID
+  name      String
   contacts  ContactTag[]
   createdAt DateTime     @default(now())
+
+  @@unique([userId, name])
+  @@index([userId])
 }
 
 model ContactTag {
@@ -105,6 +114,7 @@ model Message {
 
 model WorkflowRun {
   id            String            @id @default(cuid())
+  userId        String            // Clerk User ID
   workflowKey   WorkflowKey
   status        WorkflowRunStatus @default(PENDING)
   contact       Contact           @relation(fields: [contactId], references: [id], onDelete: Cascade)
@@ -120,6 +130,7 @@ model WorkflowRun {
 
   @@index([workflowKey, status])
   @@index([contactId])
+  @@index([userId])
 }
 
 model WorkflowStep {
@@ -151,6 +162,7 @@ model TimelineEvent {
 
 model MediaAsset {
   id            String    @id @default(cuid())
+  userId        String    // Clerk User ID
   contact       Contact?  @relation(fields: [contactId], references: [id])
   contactId     String?
   ownerLabel    String?
@@ -163,6 +175,7 @@ model MediaAsset {
 
   @@index([contactId])
   @@index([objectKey])
+  @@index([userId])
 }
 
 model CallLog {

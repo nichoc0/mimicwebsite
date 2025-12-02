@@ -1,8 +1,6 @@
 import type { Metadata } from 'next';
 import { Playfair_Display, Lato } from 'next/font/google';
-import { ClerkProvider } from '@clerk/nextjs';
 import { ThemeProvider } from '@/components/providers/theme-provider';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
 import './globals.css';
 
 const playfair = Playfair_Display({
@@ -19,25 +17,23 @@ const lato = Lato({
 });
 
 export const metadata: Metadata = {
-  title: 'SoniaRose CRM',
-  description: 'Operational console for SoniaRose relationship workflows.',
+  title: 'Mimic | Bimanual Teleoperation for AI Robotics',
+  description: 'Train robots through natural human demonstration with Mimic—a $1,000 bimanual teleoperation kit compatible with any robotic arm.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <ClerkProvider>
-      <html lang="en" suppressHydrationWarning>
-        <body className={`${playfair.variable} ${lato.variable} antialiased`}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-          </ThemeProvider>
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${playfair.variable} ${lato.variable} antialiased bg-slate-950 text-slate-200`}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem={false}
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
+      </body>
+    </html>
   );
 }

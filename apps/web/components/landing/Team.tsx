@@ -8,27 +8,27 @@ export default function Team() {
         {
             name: "Mathias Desrochers",
             role: "CEO",
-            bio: "McGill Robotics Lab RA. 1st place CEC. Firmware @ AAVAA."
+            bio: "McGill Robotics Lab RA. 1st place CEC. Firmware @ AAVAA. Defines company vision and long-term roadmap."
         },
         {
             name: "Achal Patel",
             role: "CTO",
-            bio: "Concordia Aerospace RA. 1st place CEC. ML + mobile robotics."
+            bio: "Concordia Aerospace RA. 1st place CEC. Oversees research and implementation for robotics platforms."
         },
         {
             name: "Nathanael McCooeye",
             role: "COO",
-            bio: "Former startup founder. HRI researcher. Mechanical systems lead."
+            bio: "Former startup founder. HRI researcher. Manages daily operations and mechanical hardware design."
         },
         {
             name: "Nicholas Armstrong",
             role: "CINO",
-            bio: "PistonSolutions co-founder. Bombardier alum. AI infrastructure."
+            bio: "PistonSolutions co-founder. Bombardier alum. Strategizes disruptive edge and business model."
         },
         {
             name: "Josiah McCooeye",
             role: "Advisor",
-            bio: "7yr consultancy. Six Sigma Black Belt. GTM strategy."
+            bio: "7yr consultancy. Six Sigma Black Belt. Offers business stream-lining approach."
         }
     ];
 

@@ -24,17 +24,17 @@ export default function Solution() {
                         viewport={{ once: true }}
                     >
                         <h2 className="text-4xl font-serif text-white mb-8">
-                            Your Hands. Their Arms.
+                            Intuitive Bimanual Control.
                         </h2>
                         <p className="text-lg text-slate-400 mb-8 leading-relaxed font-light">
-                            Mimic is a tabletop-mounted bimanual controller that maps your arm movements directly to any robotic arm—no training required, no complex setup.
+                            Mimic is a high-precision 3D remote controller base featuring two independent arms and an ergonomic 3D stylus. It provides 1ft³ of workspace per arm, mapping your movements directly to the robot.
                         </p>
                         <p className="text-lg text-slate-400 mb-10 leading-relaxed font-light">
-                            Move your hand forward, the robot moves forward. Rotate your wrist, it rotates. <span className="text-brand-gold font-medium">What you do is exactly what the robot does.</span>
+                            From research labs to industrial applications, Mimic offers a turnkey solution compatible with all existing platforms via lightweight firmware. <span className="text-brand-gold font-medium">What you see is what you get.</span>
                         </p>
 
                         <ul className="space-y-5">
-                            {["Plug & Play Setup", "Zero Latency Mapping", "Haptic Feedback Ready"].map((item, i) => (
+                            {["Tabletop-Mounted Base", "1ft³ Workspace Per Arm", "Universal Compatibility", "Swappable Handles"].map((item, i) => (
                                 <li key={i} className="flex items-center text-slate-300 font-light">
                                     <CheckCircle2 className="h-5 w-5 text-brand-gold mr-4" />
                                     {item}

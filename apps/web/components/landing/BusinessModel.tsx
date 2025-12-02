@@ -33,7 +33,7 @@ export default function BusinessModel() {
                             </li>
                             <li className="flex items-center text-slate-300 font-light">
                                 <Check className="h-5 w-5 text-brand-gold mr-4" />
-                                LeRobot Integration
+                                Data Collection Interface
                             </li>
                         </ul>
 

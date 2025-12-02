@@ -34,26 +34,44 @@ export default function Comparison() {
                         className="w-full text-left border-collapse"
                     >
                         <thead className="border-b border-white/10">
-                            <tr>
-                                <th className="p-6 text-slate-400 font-light text-sm uppercase tracking-wider">Feature</th>
+                            <tr className="border-b border-white/5">
+                                <th className="p-6 text-left font-serif text-white font-normal">Feature</th>
                                 <th className="p-6 text-brand-gold font-serif text-lg bg-white/5 min-w-[150px]">Mimic</th>
-                                <th className="p-6 text-slate-500 font-light text-sm uppercase tracking-wider min-w-[150px]">Haply</th>
-                                <th className="p-6 text-slate-500 font-light text-sm uppercase tracking-wider min-w-[150px]">Gello</th>
-                                <th className="p-6 text-slate-500 font-light text-sm uppercase tracking-wider min-w-[150px]">VR</th>
+                                <th className="p-6 text-slate-400 font-light min-w-[150px]">Haply</th>
+                                <th className="p-6 text-slate-400 font-light min-w-[150px]">Gello</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {features.map((feature, index) => (
-                                <tr key={index} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
-                                    <td className="p-6 text-slate-200 font-medium">{feature.name}</td>
-                                    <td className="p-6 text-white text-center bg-white/5 font-medium border-x border-white/5">
-                                        {renderValue(feature.mimic)}
-                                    </td>
-                                    <td className="p-6 text-slate-500 text-center font-light">{renderValue(feature.haply)}</td>
-                                    <td className="p-6 text-slate-500 text-center font-light">{renderValue(feature.gello)}</td>
-                                    <td className="p-6 text-slate-500 text-center font-light">{renderValue(feature.vr)}</td>
-                                </tr>
-                            ))}
+                            <tr className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                                <td className="p-6 text-white font-medium">Bimanual Control</td>
+                                <td className="p-6 text-brand-gold bg-white/5"><Check className="h-5 w-5 mx-auto" /></td>
+                                <td className="p-6 text-slate-500"><X className="h-5 w-5 mx-auto" /></td>
+                                <td className="p-6 text-slate-500"><Check className="h-5 w-5 mx-auto" /></td>
+                            </tr>
+                            <tr className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                                <td className="p-6 text-white font-medium">Workspace Volume</td>
+                                <td className="p-6 text-brand-gold bg-white/5">Large (1ft³)</td>
+                                <td className="p-6 text-slate-500">Small</td>
+                                <td className="p-6 text-slate-500">Small</td>
+                            </tr>
+                            <tr className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                                <td className="p-6 text-white font-medium">Universal Compatibility</td>
+                                <td className="p-6 text-brand-gold bg-white/5"><Check className="h-5 w-5 mx-auto" /></td>
+                                <td className="p-6 text-slate-500"><Check className="h-5 w-5 mx-auto" /></td>
+                                <td className="p-6 text-slate-500"><X className="h-5 w-5 mx-auto" /></td>
+                            </tr>
+                            <tr className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                                <td className="p-6 text-white font-medium">Swappable Handles</td>
+                                <td className="p-6 text-brand-gold bg-white/5"><Check className="h-5 w-5 mx-auto" /></td>
+                                <td className="p-6 text-slate-500"><X className="h-5 w-5 mx-auto" /></td>
+                                <td className="p-6 text-slate-500"><X className="h-5 w-5 mx-auto" /></td>
+                            </tr>
+                            <tr className="hover:bg-white/[0.02] transition-colors">
+                                <td className="p-6 text-white font-medium">Price</td>
+                                <td className="p-6 text-brand-gold font-bold bg-white/5">$1,000</td>
+                                <td className="p-6 text-slate-500">$$$</td>
+                                <td className="p-6 text-slate-500">~$400/arm</td>
+                            </tr>
                         </tbody>
                     </motion.table>
                 </div>

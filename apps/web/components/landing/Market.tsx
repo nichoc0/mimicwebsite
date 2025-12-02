@@ -36,12 +36,15 @@ export default function Market() {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                     >
-                        <h2 className="text-3xl font-bold text-white font-serif mb-6">Riding the Physical AI Wave</h2>
-                        <p className="text-lg text-slate-400 mb-6 leading-relaxed">
-                            The AI robotics market is valued at $70B+ with 16% CAGR. Stanford's Mobile ALOHA and CMU's Physical Intelligence Lab have proven that intuitive spatial controllers are becoming essential infrastructure—the mouse of robotics.
+                        <h2 className="text-3xl font-serif text-white mb-6">
+                            Bridging Research & Industry
+                        </h2>
+                        <p className="text-lg text-slate-400 mb-8 leading-relaxed font-light">
+                            The AI robotics industry is valued at over <span className="text-brand-gold font-medium">$70 billion</span>.
+                            Leading institutions like McGill, Mila, and Boston Dynamics are already investing in kinesthetic imitation learning.
                         </p>
-                        <p className="text-lg text-slate-400 mb-8 leading-relaxed">
-                            We're not competing with industrial automation. We're enabling the researchers who are building the next generation of intelligent robots.
+                        <p className="text-lg text-slate-400 mb-8 leading-relaxed font-light">
+                            Mimic addresses this emerging market by providing the intuitive spatial controllers essential for the humanoid robotics revolution.
                         </p>
 
                         <div className="bg-blue-900/20 border border-blue-500/20 rounded-xl p-6">

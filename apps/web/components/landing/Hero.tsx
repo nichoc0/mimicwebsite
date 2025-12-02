@@ -22,12 +22,12 @@ export default function Hero() {
                     className="space-y-8 text-center lg:text-left"
                 >
                     <h1 className="font-serif text-5xl font-medium leading-tight text-white lg:text-7xl tracking-tight">
-                        Teach Robots Like <br />
-                        <span className="text-brand-gold italic">You Teach Humans</span>
+                        High-Precision <br />
+                        <span className="text-brand-gold italic">3D Teleoperation Kit</span>
                     </h1>
 
                     <p className="text-lg text-slate-400 leading-relaxed max-w-xl mx-auto lg:mx-0 font-light">
-                        Mimic captures the nuance of human dexterity, enabling researchers to train robotic agents through natural demonstration.
+                        Mimic is a tabletop-mounted bimanual controller that integrates seamlessly with any robotic arm. Intuitive, accurate, and designed for the future of AI robotics.
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6 pt-4">

@@ -7,18 +7,18 @@ export default function Problem() {
     const problems = [
         {
             icon: <Clock className="h-8 w-8 text-brand-gold" />,
-            title: "Painfully Slow",
-            description: "Researchers spend more time fighting their tools than collecting data."
-        },
-        {
-            icon: <DollarSign className="h-8 w-8 text-brand-gold" />,
-            title: "Prohibitively Expensive",
-            description: "Custom rigs and VR setups cost $30,000+ and require complex maintenance."
+            title: "Complex Training",
+            description: "Training robots for precise tasks like laundry or pipetting is programmatically complex and slow."
         },
         {
             icon: <AlertTriangle className="h-8 w-8 text-brand-gold" />,
-            title: "Unnatural Control",
-            description: "Joysticks and VR controllers fail to capture the natural dexterity of human arms."
+            title: "High-Stakes Control",
+            description: "Remote bomb disposal and nuclear handling require accurate, human-like dexterity that automation lacks."
+        },
+        {
+            icon: <DollarSign className="h-8 w-8 text-brand-gold" />,
+            title: "Inadequate Tools",
+            description: "Joysticks, 3D mice, and VR controllers fail to capture the natural fluidity needed for accurate teleoperation."
         }
     ];
 

@@ -5,7 +5,7 @@ build/
 .vercel/
 .env
 .env.*
-pnpm-lock.yaml
+
 .idea/
 .DS_Store
 *.log
